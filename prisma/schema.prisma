@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatar    String   @default("https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg")
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  blogs         Blog[]    @relation("Written Blogs")
+  likedBlogs    Blog[]    @relation("Liked Blogs")
+  dislikedBlogs Blog[]    @relation("Disliked Blogs")
+  comments      Comment[]
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user       User       @relation("Written Blogs", fields: [userId], references: [id])
+  userId     String
+  likes      User[]     @relation("Liked Blogs")
+  dislikes   User[]     @relation("Disliked Blogs")
+  comments   Comment[]
+  categories Category[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  blog   Blog   @relation(fields: [blogId], references: [id])
+  blogId String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  posts Blog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  CREATOR
+  USER
+}

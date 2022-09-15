@@ -1,4 +1,7 @@
 import { useState } from "react";
+import "../styles/styles.css";
+import { Provider } from "react-redux";
+import { store } from "../store";
 
 import {
   MantineProvider,
@@ -8,7 +11,7 @@ import {
 import type { AppProps } from "next/app";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
@@ -23,7 +26,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         withNormalizeCSS
         theme={{ colorScheme }}
       >
-        <Component {...pageProps} />
+        <Provider store={store}>
+          <Component {...pageProps} />
+        </Provider>
       </MantineProvider>
     </ColorSchemeProvider>
   );
